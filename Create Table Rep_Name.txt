@@ -1,0 +1,8 @@
+CREATE TABLE [Rep_Name] (
+	[Client] nvarchar(255),
+	[LOB] nvarchar(255),
+    	[Location] nvarchar(255),
+    	[Representative Name] nvarchar(255),
+    	[Month] nvarchar(255),
+	[Year] int
+	)

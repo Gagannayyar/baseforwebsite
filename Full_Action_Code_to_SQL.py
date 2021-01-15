@@ -1,18 +1,22 @@
+# -*- coding: utf-8 -*-
 """
-This scripts is for removing the action code duplicates and system generated users by creating an
-UID using Activity date, encounter number, claim number and Rep name
+Created on Fri Jan 15 16:15:07 2021
+
+@author: GN082282
+"""
+
+
+"""
+This scripts is foruploading the action code report to SQL with select columns
 """
 
 #Importing nessary libraries
 import os
 import datetime
-import shutil
 import sys
 import pandas as pd
 import time
 import numpy as np
-import calendar
-from calendar import monthrange
 import warnings
 warnings.filterwarnings("ignore", message="numpy.dtype size changed")
 warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
@@ -100,7 +104,7 @@ for i in list_of_folder:
     folderin = os.path.join(folder,i)
     folderin_foo = folderin + "\\" + current_year + "\\" + folder_month + "\\" + week_name
     folderin_list.append(folderin_foo)
-
+      
 #getting the EATB
 
 if week_name =="EOM":
@@ -119,7 +123,7 @@ for i in folderin_list:
                 size = os.path.getsize(m)
                 if size < 2000:
                     interest_list.remove(m)
-
+                
 
 #Copying the files
 num = 0
@@ -127,16 +131,16 @@ all_data = pd.DataFrame()
 for i in interest_list:
     df = pd.read_excel(i, sheet_name = "Action Code")
     df['Client'] = (i.split("- ")[2]).split(".")[0]
-
+   
     all_data = all_data.append(df,ignore_index=True)
     print(f"Completed for {df['Client'][1]}")
-
+    
 total_time = time.time()
 
 
 #Removing unnessary users
 remove_users = ['Contributor_system , PARO',
-'Contributor_system , PFS_COLLE',
+'Contributor_system , PFS_COLLE', 
  'DO NOT MODIFY , THIS ACCOUNT',
  'DomainUser , Generated',
 'Domainuser , Generated',
@@ -163,14 +167,14 @@ all_data_filter['Created Date'] = all_data_filter['Created Date'].apply(lambda x
 
 #Renaming the columns
 
-all_data_semi = all_data_filter.rename(columns={'Encounter Number':'FIN',
+all_data_semi = all_data_filter.rename(columns={'Encounter Number':'FIN', 
                                            'Organization': 'Organization Name',
                                             'Supervising Provider': 'Supervisor Name',
                                             'Transmission Date':'Last Claim Date'})
 
 #Removing Columns
 
-all_data_semi = all_data_semi.drop(['Claim Number', 'Generation Date', 'Submission Date'], axis=1)
+all_data_semi = all_data_semi.drop(['Generation Date', 'Submission Date'], axis=1)
 
 #Converting currency to number
 
@@ -185,7 +189,7 @@ all_data_semi['Encounter Balance'] =  all_data_semi['Encounter Balance'].str.rep
 all_data_semi['Claim Amount'].astype('float')
 all_data_semi['Encounter Balance'].astype('float')
 
-new_col_list = ['Activity Date', 'Billing Entity', 'FIN',
+new_col_list = ['Activity Date', 'Billing Entity', 'FIN','Claim Number',
        'Health Plan', 'Discharge Date', 'Discharge Aging Range',
        'Last Claim Date', 'Claim Amount', 'Encounter Balance',
        'Supervisor Name', 'Representative Name', 'Action Code', 'Action Level',
@@ -201,8 +205,8 @@ all_data_fil = all_data_semi.to_numpy()
 
 print("Action code uploaded to dataframe in python")
 
-"""
-Starting the SQL update using pyodbc library. The values in the tables are
+""" 
+Starting the SQL update using pyodbc library. The values in the tables are 
 converted to numpy arrays so that the same can be appended using for loop into desired SQL Server
 """
 
@@ -212,8 +216,8 @@ def remove_NaT():
         for n,j in enumerate(i):
             if j is pd.NaT:
                 i[n] = None
-
-
+                
+                
     return all_data_fil
 
 
@@ -231,7 +235,7 @@ cursor = conn.cursor()
 
 
 #Uploading in SQL Action Code table
-insert_query = """INSERT INTO Action_Code ([Activity Date], [Billing Entity], [FIN],
+insert_query = """INSERT INTO Action_Code ([Activity Date], [Billing Entity], [FIN],[Claim Number],
                                        [Health Plan], [Discharge Date], [Discharge Aging Range],
                                        [Last Claim Date], [Claim Amount], [Encounter Balance],
                                        [Supervisor Name], [Representative Name], [Action Code],
@@ -241,7 +245,7 @@ insert_query = """INSERT INTO Action_Code ([Activity Date], [Billing Entity], [F
 
 
 for row in all_data_fil:
-    values = (row[0],str(row[1]),str(row[2]),str(row[3]),row[4],str(row[5]),row[6],str(row[7]),row[8],str(row[9]),str(row[10]),str(row[11]),str(row[12]),str(row[13]),str(row[14]),row[15],str(row[16]))
+    values = (row[0],str(row[1]),str(row[2]),str(row[3]),str(row[4]),row[5],str(row[6]),row[7],str(row[8]),row[9],str(row[10]),str(row[11]),str(row[12]),str(row[13]),str(row[14]),str(row[15]),row[16],str(row[17]))
     cursor.execute(insert_query,values)
 
 conn.commit()

@@ -1,0 +1,13 @@
+CREATE TABLE EATBxtract
+	  ([Final Status] nvarchar (255)
+      ,[Status] nvarchar (255)
+	  ,[0 to 30 days] float NULL
+      ,[31 to 60 days] float NULL
+      ,[61 to 90 days] float NULL
+      ,[91 to 120 days] float NULL
+      ,[121 to 150 days] float NULL
+      ,[151 to 180 days] float NULL
+      ,[181 to 365 days] float NULL
+      ,[366 above] float NULL
+      ,[Activity Date] datetime
+      ,[Client] nvarchar (255))
