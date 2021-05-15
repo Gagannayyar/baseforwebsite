@@ -26,3 +26,14 @@ def qqplot(df):
         pylab.title(i.upper())
         pylab.show()
     
+def heat_map(df):
+    
+    """Get the heatmap from a dataframe"""
+    import seaborn as sn # required library
+    import pandas as pd
+    CorrMatrix = df.corr()
+    sn.heatmap(corrMatrix, annot=True)
+    
+    
+    
+    
