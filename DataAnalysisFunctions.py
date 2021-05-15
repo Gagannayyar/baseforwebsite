@@ -1,5 +1,14 @@
+"""
+--------------------------------------------------------------------------------
+SOME HELPFUL FUNCTIONS FOR DATA ANALYSIS TO MAKE LIFE A BIT EASIER
+--------------------------------------------------------------------------------
+"""
+
+
 def plot_numeric(df):
-    """Plot all the numeric columns in the dataset"""
+    """
+    Plot all the numeric columns in the dataset
+    """
     import matplotlib.pyplot as plt #Library import
     df_columns = list(df.select_dtypes(include=np.number).columns) #Numerical Columns
     for i in df_columns:
@@ -28,7 +37,9 @@ def qqplot(df):
     
 def heat_map(df):
     
-    """Get the heatmap from a dataframe"""
+    """
+    Get the heatmap from a dataframe
+    """
     import seaborn as sn # required library
     import pandas as pd
     CorrMatrix = df.corr()
