@@ -43,8 +43,26 @@ def heat_map(df):
     import seaborn as sn # required library
     import pandas as pd
     CorrMatrix = df.corr()
-    sn.heatmap(corrMatrix, annot=True)
+    return sn.heatmap(corrMatrix, annot=True)
     
     
+    
+def discrete_count(df, unique_count=20):
+    """
+    Select all the object/ string columns in the 
+    dataframe with discrete values (<20 unique values default)
+    and gives the count of the discreate 
+    values in them
+    """
+    
+    #selecting the string columns
+    
+    df_columns = list(df.select_dtypes(exclude=['int64', 'float64', 'bool', 'datetime']).columns)
+    
+    for i in df_columns:
+        if len(df[i].unique()) < unique_count:
+            print(f'-----{i}-----')
+            print(df[i].value_counts())
+            
     
     
