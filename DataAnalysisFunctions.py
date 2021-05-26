@@ -65,4 +65,27 @@ def discrete_count(df, unique_count=20):
             print(df[i].value_counts())
             
     
+    def indexer(df, columns_list):
+    """
+    The function converts the strings from a spark dataframe
+    to dummy columns or do an one hot encoding
+    df = dataframe
+    columns_list = Columns that needs to be encoded (Strings)
+    """
+    #importing the desired libraries
+    from pyspark.ml.feature import (OneHotEncoder, StringIndexer)
     
+    if len(columns_list) == 1:
+        stringindex = StringIndexer(inputCol=i, outputCol=i.lower()+'index')
+        df = stringindex.fit(df).transform(df)
+        encoder = OneHotEncoder(inputCol=i.lower()+'index', outputCol=i.lower()+'vec')
+        encode = encoder.fit(df)
+        df = encode.transform(df)
+    elif len(columns_list) > 1:
+        for i in columns_list:
+            stringindex = StringIndexer(inputCol=i, outputCol=i.lower()+'index')
+            df = stringindex.fit(df).transform(df)
+            encoder = OneHotEncoder(inputCol=i.lower()+'index', outputCol=i.lower()+'vec')
+            encode = encoder.fit(df)
+            df = encode.transform(df)
+    return df 
