@@ -65,7 +65,7 @@ def discrete_count(df, unique_count=20):
             print(df[i].value_counts())
             
     
-    def indexer(df, columns_list):
+def indexer(df, columns_list):
     """
     The function converts the strings from a spark dataframe
     to dummy columns or do an one hot encoding
