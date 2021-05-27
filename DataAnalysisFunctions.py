@@ -89,3 +89,14 @@ def indexer(df, columns_list):
             encode = encoder.fit(df)
             df = encode.transform(df)
     return df 
+
+
+
+def null_values(df):
+    """
+    Find the null values in a
+    sprak dataframe
+    """
+    for i in df.columns:
+        nul = df.filter(df[i].isNull()).select(i).count()
+        print(i , nul)
