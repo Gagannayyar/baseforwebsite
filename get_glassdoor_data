@@ -1,0 +1,80 @@
+import time
+import requests
+import json
+import pandas as pd 
+import os
+
+company_code = {
+    'Concentrix':'31549',
+'Teleperformance':'9779',
+'Taskus':'350702',
+'Genpact':'42613',
+'Accenture':'4138'
+}
+
+df_main = pd.DataFrame() # creating an consolidated dataframe
+for i in company_code.keys():
+    employerid = int(company_code[i])
+    print(f"Started for {i}")
+    folder = r"C:\Users\nayyar.31\OneDrive - Teleperformance\Documents\test\test2"
+
+    os.chdir(r"C:\Users\nayyar.31\OneDrive - Teleperformance\Documents\test\test2")
+    Fname=str(i+".csv")
+    pagenumber = 1
+    pagesize = 100
+
+
+    """
+    Script to get total no of records and total pages
+    """
+    url = f'http://api.glassdoor.com/api/api.htm?t.p=109877&t.k=kfZyucqALHW&userip=&useragent=&format=json&v=1&action=employer-review&employerId={employerid}&pageNumber=1&pageSize={pagesize}&includeReviewText=true'
+
+    headers = {
+        'User-Agent': 'My User Agent 1.0',
+        'From': 'youremail@domain.com'  # This is another valid field
+    }
+
+    response = requests.get(url, headers=headers)
+    jsonoutput = response.json()
+
+
+    if jsonoutput.get('success') == 'true':
+        responsedict = jsonoutput.get('response')
+        totalpages = responsedict.get('totalNumberOfPages')
+        totalrecords = responsedict.get('totalRecordCount')
+    else:
+        totalpages = 0
+        totalrecords = 0
+    print(totalpages)
+    """
+    # looped extraction
+    Once we have both pages and number of records, we are running loop to extract data
+    To overcome memory issue, we are storing indivisual file for each run
+    """
+
+
+    
+    while pagenumber <= totalpages:  # until it becomes 0
+        url = f'http://api.glassdoor.com/api/api.htm?t.p=109877&t.k=kfZyucqALHW&userip=&useragent=&format=json&v=1&action=employer-review&employerId={employerid}&pageNumber={pagenumber}&pageSize={pagesize}&includeReviewText=true'
+
+        headers = {
+            'User-Agent': 'My User Agent 1.0',
+            'From': 'youremail@domain.com'  # This is another valid field
+        }
+
+        response = requests.get(url, headers=headers)
+        jsonoutput = response.json()
+        if jsonoutput.get('success') == 'true':  # only if it is true then proceed
+            responsedict = jsonoutput.get('response')  # obtain the responsedict
+            if responsedict:  # double check the existence
+                reviews = responsedict.get('reviews')
+                # append this to the master reviews variable
+                #allreviews.append(reviews)
+                df=pd.DataFrame(reviews) # convert it into a df
+                #df.to_csv(f"{pagenumber}.csv")   #@redundant
+                df_main = df_main.append(df)
+                print(df_main.shape)
+                print(f"Completed {pagenumber}")
+        pagenumber = pagenumber+1  # increase up till total pages
+        time.sleep(5)  # sleep
+    df_main.to_csv(os.path.join(folder,Fname))
